@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Tupen</string>
+    <string name="action_settings">Search</string>
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="image">image</string>
+</resources>

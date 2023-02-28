@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddNote">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/addNote_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Theme.Tupen.PopupOverlay"
+        app:titleTextColor="@color/white"
+        app:title="Add New Note" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding='16dp'>
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title "
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editTextTextPersonName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/textViewNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop='16dp'
+            android:text="Note"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editTextTextMultiLine"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/rounded_edittext"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:padding="8dp" />
+
+
+        <TextView
+            android:id="@+id/textViewAddNoteImg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Note Images"
+            android:textSize="18sp"
+            android:layout_marginTop='16dp' />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop='4dp'>
+
+            <ImageView
+                android:id="@+id/note_image_1"
+                android:layout_width="180dp"
+                android:layout_height="160dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/music" />
+
+            <ImageView
+                android:id="@+id/note_image_2"
+                android:layout_width="180dp"
+                android:layout_height="160dp"
+                android:scaleType="centerCrop"
+                android:layout_marginLeft='16dp'
+                app:rippleColor="@color/teal_200"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/music"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop='16dp'>
+
+            <TextView
+                android:id="@+id/textViewAddNoteAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="Add Note Audio: "
+                android:textSize="18sp"
+                android:layout_marginTop='8dp' />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/purple_700"
+                android:text="Select file" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textAudioName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Lecture 2 on CSC.mp3"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop='8dp' />
+
+        <Button
+            android:layout_marginTop='24dp'
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/primary_button"
+            android:textColor="@color/white"
+            android:text="Save Note" />
+
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
