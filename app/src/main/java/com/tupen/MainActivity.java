@@ -2,24 +2,21 @@ package com.tupen;
 
 import android.content.Intent;
 import android.os.Bundle;
-
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
 
+    DBHelper dbHelper;
     private RecyclerView recyclerView;
     private NoteAdapter noteAdapter;
-    DBManager dbManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +27,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        dbManager = new DBManager(this);
-
-        try {
-            dbManager.open();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
+        dbHelper = new DBHelper(this);
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -46,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
-
 
 
     @Override

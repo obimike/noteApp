@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_edittext"
             android:ems="10"
+            android:textColor="@color/black"
             android:inputType="textPersonName"
             android:padding="8dp" />
 
@@ -56,6 +57,7 @@
             android:ems="10"
             android:gravity="start|top"
             android:inputType="textMultiLine"
+            android:textColor="@color/black"
             android:padding="8dp" />
 
 
@@ -126,7 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Lecture 2 on CSC.mp3"
+            android:text="No audio file selected..."
             android:textSize="18sp"
             android:textStyle="italic"
             android:ellipsize="end"
