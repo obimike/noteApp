@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private RecyclerView recyclerView;
+    private NoteAdapter noteAdapter;
+    DBManager dbManager;
 
 
     @Override
@@ -28,6 +30,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
+        dbManager = new DBManager(this);
+
+        try {
+            dbManager.open();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -36,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
