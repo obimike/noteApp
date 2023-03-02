@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tupen">
+    package="com.tupen"
+    android:installLocation="internalOnly">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
-
-    <!-- Required only if your app needs to access audio files
-     that other apps created. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!--
+ Required only if your app needs to access audio files
+     that other apps created.
+    -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -30,6 +33,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tupen">
         <activity
+            android:name=".Details"
+            android:exported="false" />
+        <activity
             android:name=".AddNote"
             android:exported="false" />
         <activity
@@ -45,7 +51,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:theme="@style/Theme.Tupen.NoActionBar"/>
+            android:theme="@style/Theme.Tupen.NoActionBar" />
     </application>
 
 </manifest>

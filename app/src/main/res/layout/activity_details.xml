@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Details">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/note_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Theme.Tupen.PopupOverlay"
+        app:title="Note"
+        app:titleTextColor="@color/white" />
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="How do I align views at the bottom of the screen?"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/detail_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/long_text"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/detail_image_1"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:clickable="true"
+            android:contentDescription="@string/image"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img" />
+
+        <ImageView
+            android:id="@+id/detail_image_2"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:clickable="true"
+            android:contentDescription="@string/image"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/music" />
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+</LinearLayout>

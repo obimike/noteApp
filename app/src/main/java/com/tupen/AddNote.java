@@ -12,6 +12,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.MenuItem;
@@ -29,7 +31,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Objects;
 
 public class AddNote extends AppCompatActivity {
@@ -51,6 +59,11 @@ public class AddNote extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 124);
+        }
+
         Toolbar toolbar = findViewById(R.id.addNote_toolbar);
         setSupportActionBar(toolbar);
 
@@ -58,26 +71,16 @@ public class AddNote extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_arrow);
 
-        // op
+        // initializing db
+        dbHelper = new DBHelper(this);
 
         title = findViewById(R.id.editTextTitle);
         body = findViewById(R.id.editTextBody);
         imagePath1 = findViewById(R.id.note_image_1);
         imagePath2 = findViewById(R.id.note_image_2);
         Button addAudio = findViewById(R.id.addAudioButton);
+        Button saveNote = findViewById(R.id.saveButton);
         audioName = findViewById(R.id.textAudioName);
-
-
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 124);
-        } else {
-            // permission already granted
-        }
-
 
         imagePath1.setOnClickListener(v -> {
             IMAGE_SELECTED = 1;
@@ -97,8 +100,32 @@ public class AddNote extends AppCompatActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Audio File"), PICK_AUDIO);
         });
 
+        saveNote.setOnClickListener(v -> {
 
+            // Create a Date object with the desired date
+            Date date = new GregorianCalendar().getTime();
+            // Create a SimpleDateFormat object with the desired format
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.US);// Format the date and print it
+            String formattedDate = sdf.format(date);
+            System.out.println(formattedDate);
 
+            String titleText = title.getText().toString().trim();
+            String bodyText = body.getText().toString().trim();
+
+            if (!titleText.isEmpty() && !bodyText.isEmpty()) {
+               long add = dbHelper.addNote(titleText, bodyText, mImageUri1.toString(), mImageUri2.toString(), mAudioUri.toString(), formattedDate);
+               System.out.println(add);
+               if (add > 0){
+                   Toast.makeText(this, "Note Saved.", Toast.LENGTH_LONG).show();
+                   startActivity(new Intent(this, MainActivity.class));
+               }
+               System.out.println(mImageUri2.toString());
+               System.out.println(mImageUri1.toString());
+               System.out.println(mAudioUri.toString());
+            } else {
+                Toast.makeText(this, "Title or Body can't be empty.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -130,10 +157,12 @@ public class AddNote extends AppCompatActivity {
             if (IMAGE_SELECTED == 1) {
                 imagePath1.setImageBitmap(imageBitmap);
                 mImageUri1 = getImageUri(getApplicationContext(), imageBitmap);
+                moveFile(mImageUri1);
                 System.out.println(mImageUri1);
             } else {
                 imagePath2.setImageBitmap(imageBitmap);
                 mImageUri2 = getImageUri(getApplicationContext(), imageBitmap);
+                moveFile(mImageUri2);
                 System.out.println(mImageUri2);
             }
         }else if (requestCode == PICK_AUDIO && resultCode == RESULT_OK) {
@@ -217,6 +246,33 @@ public class AddNote extends AppCompatActivity {
         }
         System.out.println("---------================--------: " + fileName);
         return fileName;
+    }
+
+    void moveFile(Uri uri){
+        File source = new File(getRealPathFromURI(uri));
+        File destination = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/tupen/" + source.getName());
+
+        try {
+            Files.copy(source.toPath(), destination.toPath());
+//            FileUtils.copyFile(source, destination);
+            source.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 
     @Override
