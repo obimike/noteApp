@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -31,10 +32,22 @@ public class MainActivity extends AppCompatActivity {
 
     File folder;
 
+    private static final int REQUEST_PERMISSIONS = 111;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSIONS);
+        } else {
+            Log.d("App", "Permission has already been granted");
+        }
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -42,27 +55,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
         folder = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
 
-        // Create the folder if it doesn't exist
-        if (!folder.exists()) {
-            if (!folder.mkdirs()) {
-                Log.d("App", "failed to create directory");
-            }
-        } else {
-            Log.d("App", folder.getAbsolutePath());
-        }
 
-        // Create the file in the folder
-        File file = new File(folder, fileName);
-
-        // Write some data to the file
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         dbHelper = new DBHelper(this);
 
@@ -107,6 +103,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSIONS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted
+                // Start accessing media files here
+                Log.d("App", "Start accessing media files here");
+
+                // Create the folder if it doesn't exist
+                if (!folder.exists()) {
+                    if (!folder.mkdirs()) {
+                        Log.d("App", "failed to create directory");
+                    }
+                } else {
+                    Log.d("App", folder.getAbsolutePath());
+                }
+
+                // Create the file in the folder
+                File file = new File(folder, fileName);
+
+                // Write some data to the file
+                try {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.d("App", "Permission has been denied");
+                // Permission has been denied
+                // Display an error message or take appropriate action
+            }
+        }
     }
 
 }

@@ -6,8 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import androidx.annotation.Nullable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                null
+                NOTE_DATE
         );
         while (cursor.moveToNext()) {
             @SuppressLint("Range")int id = cursor.getInt(cursor.getColumnIndex(DBHelper.NOTE_ID));
@@ -93,6 +92,7 @@ public class DBHelper extends SQLiteOpenHelper {
             @SuppressLint("Range")String audioPath = cursor.getString(cursor.getColumnIndex(DBHelper.NOTE_AUDIO));
             @SuppressLint("Range")String date = cursor.getString(cursor.getColumnIndex(DBHelper.NOTE_DATE));
 
+
             notes.add(new Note(id, title, body, imagePath, imagePath2, audioPath, date));
 
         }
@@ -101,4 +101,10 @@ public class DBHelper extends SQLiteOpenHelper {
         return notes;
     }
 
+    public long deleteNote(int id){
+        SQLiteDatabase db = getWritableDatabase();
+        long rowsDeleted = db.delete(DB_TABLE, NOTE_ID + "=" + id, null);
+        db.close();
+        return rowsDeleted;
+    }
 }

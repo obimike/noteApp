@@ -5,4 +5,5 @@
 
     <string name="image">image</string>
     <string name="long_text">From the output, it’s clear that Stream Copy is the best way to copy File in Java. But it’s a very basic test. If you are working on a performance intensive project, then you should try out different methods for java copy file and note down the timings to figure out the best approach for your project. You should also play around different ways of java copy files based on your average size of the file. I have created a YouTube video for 4 ways to copy the file in java, you can watch it to learn more. </string>
+    <string name="action_delete">Delete</string>
 </resources>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/note_card"
     android:layout_width="match_parent"
@@ -20,8 +19,9 @@
         android:padding="16dp">
 
         <RelativeLayout
-            android:layout_width="220dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -60,10 +60,9 @@
 
         <ImageView
             android:id="@+id/note_image"
-            android:layout_width="0dp"
+            android:layout_width="135dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
             android:contentDescription="image"
             android:scaleType="centerCrop"
             android:src="@drawable/music" />

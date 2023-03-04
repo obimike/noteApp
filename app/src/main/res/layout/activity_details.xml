@@ -16,55 +16,124 @@
         app:popupTheme="@style/Theme.Tupen.PopupOverlay"
         app:title="Note"
         app:titleTextColor="@color/white" />
-<ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/detail_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="How do I align views at the bottom of the screen?"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/detail_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/long_text"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/detail_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="March 12, 2023"
+                android:textSize="18sp"
+                android:gravity="end"
+                android:textStyle="italic"
+                android:layout_marginBottom="8dp"/>
 
-        <ImageView
-            android:id="@+id/detail_image_1"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:clickable="true"
-            android:contentDescription="@string/image"
-            android:focusable="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img" />
+            <TextView
+                android:id="@+id/detail_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="How do I align views at the bottom of the screen?"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
-        <ImageView
-            android:id="@+id/detail_image_2"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:clickable="true"
-            android:contentDescription="@string/image"
-            android:focusable="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/music" />
 
-    </LinearLayout>
 
-</ScrollView>
+            <com.denzcoskun.imageslider.ImageSlider
+                android:id="@+id/image_slider"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:iss_auto_cycle="true"
+                app:iss_period="2000"
+                app:iss_delay="0"
+                />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                >
+
+                <!-- Add a TextView to display the audio file name -->
+                <TextView
+                    android:id="@+id/audio_file_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textSize="18sp"
+                    android:text="Audio File Name" />
+
+                <!-- Add a SeekBar to display the audio playback progress -->
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/audio_file_name"
+                    android:padding="10dp" />
+
+
+                <!-- Add buttons for Play, Pause, and Stop -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/seek_bar"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/play_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:text="Play" />
+
+                    <Button
+                        android:id="@+id/pause_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:text="Pause" />
+
+                    <Button
+                        android:id="@+id/stop_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:text="Stop" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/detail_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/long_text"
+                android:textSize="18sp" />
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
 
 
 </LinearLayout>

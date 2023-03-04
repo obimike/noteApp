@@ -36,7 +36,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         Note note = notes.get(position);
         holder.title.setText(note.getTitle());
         holder.body.setText(note.getBody());
-//        holder.image.setImageURI(Uri.parse(note.getImagePath()));
+        holder.image.setImageURI(Uri.parse(note.getImagePath()));
 
         holder.date.setText(note.getDate());
 
@@ -51,6 +51,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                 intent.putExtra("image_2", note.getImagePath2());
                 intent.putExtra("audio", note.getAudioPath());
                 intent.putExtra("date", note.getDate());
+
 
                 context.startActivity(intent);
             }

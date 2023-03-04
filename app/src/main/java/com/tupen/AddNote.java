@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.MenuItem;
@@ -227,7 +226,7 @@ public class AddNote extends AppCompatActivity {
     }
 
     @SuppressLint("Range")
-    public String getFileNameFromUri(Uri uri) {
+    public  String getFileNameFromUri(Uri uri) {
         String fileName = null;
         String scheme = uri.getScheme();
         if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
