@@ -13,7 +13,10 @@ import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,13 +29,15 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Details extends AppCompatActivity {
     DBHelper dbHelper;
     int _id;
+    // Initialize a new MediaPlayer object
+    MediaPlayer mediaPlayer = new MediaPlayer();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,7 @@ public class Details extends AppCompatActivity {
         dbHelper = new DBHelper(this);
 
         Intent intent = getIntent();
+
 
         ArrayList<SlideModel> images = new ArrayList<>();
         ImageSlider imageSlider = findViewById(R.id.image_slider);
@@ -69,67 +75,120 @@ public class Details extends AppCompatActivity {
         String image1 = intent.getStringExtra("image_1");
         String image2 = intent.getStringExtra("image_2");
 
+        Log.d("App", image2);
+
         images.add(new SlideModel(image1, null));
-        images.add(new SlideModel(image2, null));
+        if (!image2.isEmpty()){
+            images.add(new SlideModel(image2, null));
+        }
 
         imageSlider.setImageList(images, ScaleTypes.CENTER_CROP);
 
+        RelativeLayout audioLayout = findViewById(R.id.audio_layout);
+
         String audioPath = intent.getStringExtra("audio");
-        TextView audioName = findViewById(R.id.audio_file_name);
-        audioName.setText(getFileNameFromUri(Uri.parse(audioPath)));
+
+        if (audioPath.isEmpty()){
+            audioLayout.setVisibility(View.GONE);
+        }else {
+            TextView audioName = findViewById(R.id.audio_file_name);
+            audioName.setText(getFileNameFromUri(Uri.parse(audioPath)));
+
+            Uri audioUri = Uri.parse(audioPath);
+
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).setUsage(AudioAttributes.USAGE_MEDIA).build());
+
+            try {
+                mediaPlayer.setDataSource(getApplicationContext(), audioUri);
+                mediaPlayer.prepare();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
 
         Button play = findViewById(R.id.play_button);
         Button pause = findViewById(R.id.pause_button);
         Button stop = findViewById(R.id.stop_button);
 
         // Initialize a new MediaPlayer object
-        MediaPlayer mediaPlayer = new MediaPlayer();;
-        Uri myUri = Uri.parse(audioPath);; // initialize Uri here
 
-        mediaPlayer.setAudioAttributes(
-                new AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build()
-        );
+        SeekBar seekBar = findViewById(R.id.seek_bar);
 
 
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), myUri);
-            mediaPlayer.prepare();
-//            mediaPlayer = MediaPlayer.create(this, R.raw.musik);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
-        play.setOnClickListener(v -> {
-            // Start playing the audio file
-            mediaPlayer.start();
+        final TextView seekBarHint = findViewById(R.id.textView);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seekBarHint.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
+                seekBarHint.setVisibility(View.VISIBLE);
+                int x = (int) Math.ceil(progress / 1000f);
+
+                if (x > 0 && !mediaPlayer.isPlaying()) {
+                    seekBar.setProgress(0);
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.seekTo(seekBar.getProgress());
+                }
+            }
         });
+
 
         pause.setOnClickListener(v -> {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
+                System.out.println(seekBar.getProgress());
+                seekBar.setProgress(seekBar.getProgress());
             }
         });
 
         stop.setOnClickListener(v -> {
-            mediaPlayer.stop();
+//            mediaPlayer.stop();
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                mediaPlayer.seekTo(0);
+                seekBar.setProgress(0);
+            }
         });
 
+
+        Runnable updateSeekBar = () -> {
+            int currentPosition = mediaPlayer.getCurrentPosition();
+            int total = mediaPlayer.getDuration();
+
+            while (mediaPlayer.isPlaying() && currentPosition < total) {
+                try {
+                    Thread.sleep(1000);
+                    currentPosition = mediaPlayer.getCurrentPosition();
+                } catch (Exception e) {
+                    return;
+                }
+                seekBar.setProgress(currentPosition);
+
+            }
+        };
+
+        play.setOnClickListener(v -> {
+            seekBar.setMax(mediaPlayer.getDuration());
+            // Start playing the audio file
+            mediaPlayer.start();
+            new Thread(updateSeekBar).start();
+        });
+
+
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        } else if (item.getItemId() == R.id.action_delete) {
-            Log.d("App", "Delete clicked!");
-            deleteNote();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void deleteNote() {
         // Create an AlertDialog.Builder object
@@ -144,7 +203,7 @@ public class Details extends AppCompatActivity {
             // Do something when the user clicks the OK button
             long delete = dbHelper.deleteNote(_id);
             Log.d("App", String.valueOf(delete));
-            if (delete > 0){
+            if (delete > 0) {
                 Toast.makeText(this, "Note Deleted.", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(this, MainActivity.class));
             } else {
@@ -153,11 +212,9 @@ public class Details extends AppCompatActivity {
         });
 
         // Set a negative button and its click listener
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                // Do something when the user clicks the Cancel button
-                dialog.dismiss();
-            }
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Do something when the user clicks the Cancel button
+            dialog.dismiss();
         });
 
         // Create and show the AlertDialog
@@ -166,7 +223,7 @@ public class Details extends AppCompatActivity {
     }
 
     @SuppressLint("Range")
-    public  String getFileNameFromUri(Uri uri) {
+    public String getFileNameFromUri(Uri uri) {
         String fileName = null;
         String scheme = uri.getScheme();
         if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
@@ -192,5 +249,32 @@ public class Details extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Log.d("App", "android.R.id.home");
+            onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.action_delete) {
+            Log.d("App", "Delete clicked!");
+            deleteNote();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void releaseMediaPlayer() {
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("App", "onDestroy");
+        // Stop and release the MediaPlayer
+        releaseMediaPlayer();
     }
 }

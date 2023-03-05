@@ -59,6 +59,7 @@
 
 
             <RelativeLayout
+                android:id="@+id/audio_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
@@ -81,6 +82,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/audio_file_name"
                     android:padding="10dp" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
 
                 <!-- Add buttons for Play, Pause, and Stop -->

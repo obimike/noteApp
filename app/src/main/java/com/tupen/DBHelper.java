@@ -81,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                NOTE_DATE
+                NOTE_ID + " DESC"
         );
         while (cursor.moveToNext()) {
             @SuppressLint("Range")int id = cursor.getInt(cursor.getColumnIndex(DBHelper.NOTE_ID));
