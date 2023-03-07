@@ -36,6 +36,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         Note note = notes.get(position);
         holder.title.setText(note.getTitle());
         holder.body.setText(note.getBody());
+
+
         holder.image.setImageURI(Uri.parse(note.getImagePath()));
 
         holder.date.setText(note.getDate());

@@ -77,20 +77,22 @@
 
             <ImageView
                 android:id="@+id/note_image_1"
-                android:layout_width="180dp"
+                android:layout_width="0dp"
                 android:layout_height="160dp"
                 android:clickable="true"
                 android:focusable="true"
+                android:layout_weight="1"
                 android:contentDescription="@string/image"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img" />
 
             <ImageView
                 android:id="@+id/note_image_2"
-                android:layout_width="180dp"
+                android:layout_width="0dp"
                 android:layout_height="160dp"
+                android:layout_weight="1"
                 android:scaleType="centerCrop"
-                android:layout_marginLeft='16dp'
+                android:layout_marginStart='16dp'
                 app:rippleColor="@color/teal_200"
                 android:clickable="true"
                 android:focusable="true"

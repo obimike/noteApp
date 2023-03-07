@@ -5,15 +5,16 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Button;
@@ -27,8 +28,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,6 +43,8 @@ public class AddNote extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     private static final int PICK_AUDIO = 3;
+
+    private static final int PERMISSION_REQUEST_CODE = 4;
     private static int IMAGE_SELECTED = 0;
     DBHelper dbHelper;
     EditText title, body;
@@ -50,13 +55,18 @@ public class AddNote extends AppCompatActivity {
     private Uri mImageUri2;
     private Uri mAudioUri;
 
+    Intent intent;
+    private static final String TAG = "App";
+
+    String currentPhotoPath;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 124);
         }
 
@@ -89,7 +99,12 @@ public class AddNote extends AppCompatActivity {
 
         addAudio.setOnClickListener(v -> {
             // Create an intent to open the file picker
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setType("audio/*");
 
             // Start the activity to select a file
@@ -139,6 +154,7 @@ public class AddNote extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -148,11 +164,25 @@ public class AddNote extends AppCompatActivity {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mImageUri);
                 if (IMAGE_SELECTED == 1) {
+                    Log.d(TAG, "onActivityResult: image select 1 " + data.getData());
+                    final int takeFlags = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                    ContentResolver resolver = this.getContentResolver();
+                    resolver.takePersistableUriPermission(data.getData(), takeFlags);
+
                     imagePath1.setImageBitmap(bitmap);
                     mImageUri1 = mImageUri;
                     IMAGE_SELECTED = 0;
+
                     System.out.println(mImageUri1);
                 } else {
+                    final int takeFlags = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                    ContentResolver resolver = this.getContentResolver();
+                    resolver.takePersistableUriPermission(data.getData(), takeFlags);
+
+
+                    Log.d(TAG, "onActivityResult: image select 2 " + data.getData());
+
+
                     IMAGE_SELECTED = 0;
                     mImageUri2 = mImageUri;
                     imagePath2.setImageBitmap(bitmap);
@@ -163,33 +193,43 @@ public class AddNote extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
             if (IMAGE_SELECTED == 1) {
-                imagePath1.setImageBitmap(imageBitmap);
-                mImageUri1 = getImageUri(getApplicationContext(), imageBitmap);
+                // Get the URI for the photo file
+                File photoFile = new File(currentPhotoPath);
+                Uri photoUri = FileProvider.getUriForFile(this, "com.tupen.fileprovider", photoFile);
+
+                imagePath1.setImageURI(photoUri);
+                mImageUri1 = photoUri;
+
+                Log.d(TAG, "onActivityResult photoUri: image capture 1 " + photoUri);
 
                 System.out.println(mImageUri1);
             } else {
-                imagePath2.setImageBitmap(imageBitmap);
-                mImageUri2 = getImageUri(getApplicationContext(), imageBitmap);
+                // Get the URI for the photo file
+                File photoFile = new File(currentPhotoPath);
+                Uri photoUri = FileProvider.getUriForFile(this, "com.tupen.fileprovider", photoFile);
+
+                imagePath2.setImageURI(photoUri);
+                mImageUri2 = photoUri;
+
+                Log.d(TAG, "onActivityResult photoUri: image capture 1 " + photoUri);
 
                 System.out.println(mImageUri2);
             }
         } else if (requestCode == PICK_AUDIO && resultCode == RESULT_OK) {
+            final int takeFlags = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+            ContentResolver resolver = this.getContentResolver();
+            resolver.takePersistableUriPermission(data.getData(), takeFlags);
+
+            Log.d(TAG, "onActivityResult: " + data.getData());
+
             mAudioUri = data.getData();
             audioName.setText(getFileNameFromUri(mAudioUri));
         }
     }
 
     // Get the Uri of an image bitmap
-    private Uri getImageUri(Context context, Bitmap bitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
-        return Uri.parse(path);
-    }
-
 
     public void openPhotoDialog() {
 
@@ -202,9 +242,8 @@ public class AddNote extends AppCompatActivity {
         ImageView gallery = dialog.findViewById(R.id.gallery);
 
         camera.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Please allow the use of camera permission.", Toast.LENGTH_LONG).show();
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
             } else {
                 launchCamera(dialog);
             }
@@ -219,21 +258,53 @@ public class AddNote extends AppCompatActivity {
 
     //  open the default gallery app
     private void launchGallery(Dialog d) {
-        Intent intent = new Intent();
+        // Create an intent to open the file picker
+        intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+
         d.dismiss();
         startActivityForResult(Intent.createChooser(intent, "Select a picture"), PICK_IMAGE_REQUEST);
     }
 
     // open the default camera
     private void launchCamera(Dialog d) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         try {
-            d.dismiss();
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            dispatchTakePictureIntent(d);
         } catch (ActivityNotFoundException e) {
-            // display error state to the user
+            Log.d(TAG, "Error: " + e);
+        }
+    }
+
+    private void dispatchTakePictureIntent(Dialog d) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        takePictureIntent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.tupen.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                d.dismiss();
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
         }
     }
 
@@ -259,6 +330,33 @@ public class AddNote extends AppCompatActivity {
         return fileName;
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "onRequestPermissionsResult: ");
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

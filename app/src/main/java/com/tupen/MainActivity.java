@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     DBHelper dbHelper;
 
     private static final int REQUEST_PERMISSIONS = 111;
+    private static final int REQUEST_PERMISSIONS_WRITE = 112;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +97,21 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Start accessing media files here
                 Log.d("App", "Start accessing media files here");
+                 if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSIONS_WRITE);
+                }else {
+                     Log.d("App", "Write Permission has already been granted");
+                 }
 
             } else {
                 Log.d("App", "Permission has been denied");
                 // Permission has been denied
             }
+        } else if (requestCode == REQUEST_PERMISSIONS_WRITE) {
+            Log.d("App", "Write Permission has been grant");
         }
     }
 }

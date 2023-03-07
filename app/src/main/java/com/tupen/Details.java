@@ -200,6 +200,7 @@ public class Details extends AppCompatActivity {
 
         // Set a positive button and its click listener
         builder.setPositiveButton("OK", (dialog, which) -> {
+            releaseMediaPlayer();
             // Do something when the user clicks the OK button
             long delete = dbHelper.deleteNote(_id);
             Log.d("App", String.valueOf(delete));
